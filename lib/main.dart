@@ -106,7 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
           });
         });
       } else {
-        throw Exception('拜拜');
+        throw Exception('这会儿我不在哦~有事就给我留言吧');
       }
     } catch (e) {
       // 将异常对象转换为字符串
@@ -172,13 +172,20 @@ class _ChatScreenState extends State<ChatScreen> {
                     Expanded(
                       child: TextField(
                         controller: _controller,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Enter a message',
+                          filled: true, // 添加这一行
+                          fillColor: Color.fromARGB(
+                              255, 238, 238, 238), // 添加这一行，设置为浅灰色
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.send),
+                      color: Color.fromARGB(255, 238, 238, 238),
                       onPressed: () => _sendMessage(_controller.text, true),
                     ),
                   ],
