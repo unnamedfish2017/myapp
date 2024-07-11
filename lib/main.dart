@@ -47,8 +47,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _simulateAutoReply(String userMessage) async {
     // 调用 Moonshot API 获取自动回复
-    const String apiUrl = 'https://api.moonshot.cn/v1/chat/completions'; // 替换为你的 Moonshot API URL
-    const String apiKey = 'sk-3sq88ly5bVhIQNbuqPi7xPiLlG5mtNrucHI0LbHK6RnDmDGb'; // 替换为你的 API KEY
+    const String apiUrl =
+        'https://api.moonshot.cn/v1/chat/completions'; // 替换为你的 Moonshot API URL
+    const String apiKey =
+        'sk-3sq88ly5bVhIQNbuqPi7xPiLlG5mtNrucHI0LbHK6RnDmDGb'; // 替换为你的 API KEY
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {
@@ -60,7 +62,8 @@ class _ChatScreenState extends State<ChatScreen> {
         'messages': [
           {
             'role': 'system',
-            'content': '你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。'
+            'content':
+                '你现在扮演我的女友小红，一个软萌妹子，会陪我聊天。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
           },
           {'role': 'user', 'content': userMessage},
         ],
@@ -70,7 +73,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final replyMessage = data['choices'][0]['message']['content']; // 假设 API 返回的 JSON 包含一个 'reply' 字段
+      final replyMessage = data['choices'][0]['message']
+          ['content']; // 假设 API 返回的 JSON 包含一个 'reply' 字段
 
       setState(() {
         _messages.add({
@@ -82,7 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
       // 处理 API 请求失败的情况
       setState(() {
         _messages.add({
-          'text': 'Failed to get reply from Moonshot API',
+          'text': '我去洗澡了哦',
           'isUserMessage': false,
         });
       });
@@ -109,8 +113,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? Colors.blue[200]
                     : Colors.grey[300];
                 return Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 10, horizontal: 14),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   alignment: alignment,
                   child: Container(
                     padding: const EdgeInsets.all(10),
