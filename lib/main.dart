@@ -173,13 +173,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     final alignment = isUserMessage
                         ? Alignment.centerRight
                         : Alignment.centerLeft;
-                    final color = isUserMessage
-                        ? Colors.blue[200]
-                        : Colors.grey[300];
+                    final color =
+                        isUserMessage ? Colors.blue[200] : Colors.grey[300];
                     final avatar = isUserMessage
-                        ? 'assets/user_avatar.png'
+                        ? 'assets/user_avatar.jpg'
                         : 'assets/system_avatar.png';
-                    
+
                     return Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 14),
@@ -201,8 +200,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                             child: Text(message['text']),
                           ),
-                          if (isUserMessage)
-                            const SizedBox(width: 8),
+                          if (isUserMessage) const SizedBox(width: 8),
                           if (isUserMessage)
                             CircleAvatar(
                               backgroundImage: AssetImage(avatar),
@@ -223,7 +221,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         decoration: InputDecoration(
                           hintText: 'Enter a message',
                           filled: true, // 添加这一行
-                          fillColor: Color.fromARGB(255, 238, 238, 238), // 添加这一行，设置为浅灰色
+                          fillColor: Color.fromARGB(
+                              255, 238, 238, 238), // 添加这一行，设置为浅灰色
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

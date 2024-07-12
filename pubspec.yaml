@@ -1,5 +1,5 @@
-name: myapp
-description: A new Flutter project.
+name: xiaoxia
+description: Ur GF.
 
 publish_to: 'none' # Remove this line if you are publishing to pub.dev
 version: 1.0.0+1
@@ -26,3 +26,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/background.png
+    - assets/user_avatar.png
+    - assets/user_avatar.jpg
+    - assets/system_avatar.png
+
