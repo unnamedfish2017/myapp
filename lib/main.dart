@@ -52,16 +52,20 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _simulateAutoReply(String userMessage) async {
     // 替换为你的 Moonshot API 相关信息
-    const String apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
-    const String apiKey =
-        'sk-3sq88ly5bVhIQNbuqPi7xPiLlG5mtNrucHI0LbHK6RnDmDGb'; // 替换为你的 API KEY
+    //moonshot
+    // const String apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
+    // const String apiKey =
+    //     'sk-3sq88ly5bVhIQNbuqPi7xPiLlG5mtNrucHI0LbHK6RnDmDGb'; // 替换为你的 API KEY
 
+    //deepseek
+    const String apiUrl = "https://api.deepseek.com/chat/completions";
+    const String apiKey ="sk-029ef31805dc4a2e944e89a161367a8e";
     try {
       // 构建消息历史
       List<Map<String, dynamic>> messageHistory = [
         {
           'role': 'system',
-          'content': '你现在扮演我的女友小红，一个软萌妹子，会陪我聊天。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
+          'content': '你现在扮演我的女友小夏，一个软萌妹子，会陪我聊天。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
         },
         {'role': 'user', 'content': userMessage},
       ];
@@ -85,17 +89,22 @@ class _ChatScreenState extends State<ChatScreen> {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $apiKey',
         },
+        // body: json.encode({
+        //   'model': 'moonshot-v1-8k',
+        //   'messages': messageHistory,
+        //   'temperature': 0.3,
+        // }),
+
         body: json.encode({
-          'model': 'moonshot-v1-8k',
+          'model': 'deepseek-chat',
           'messages': messageHistory,
-          'temperature': 0.3,
+          'temperature': 1.25,
         }),
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = json.decode(utf8.decode(response.bodyBytes));
         final replyMessage = data['choices'][0]['message']['content'] as String;
-
         setState(() {
           if (_messages.length >= maxMessages) {
             _messages.removeAt(0); // 删除最旧的消息，以保留最新的 maxMessages 条消息
@@ -126,7 +135,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: const Text('小夏'),
       ),
       body: Stack(
         children: [
