@@ -61,13 +61,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
     //deepseek
     const String apiUrl = "https://api.deepseek.com/chat/completions";
-    const String apiKey ="sk-029ef31805dc4a2e944e89a161367a8e";
+    const String apiKey = "sk-029ef31805dc4a2e944e89a161367a8e";
     try {
       // 构建消息历史
       List<Map<String, dynamic>> messageHistory = [
         {
           'role': 'system',
-          'content': '你现在扮演我的女友小夏，一个软萌妹子，会陪我聊天。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
+          'content': '你现在扮演我的女友小夏，性格非常高冷，对我爱答不理。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
         },
         {'role': 'user', 'content': userMessage},
       ];
@@ -165,27 +165,49 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
-		  controller: _scrollController,
+                  controller: _scrollController,
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final message = _messages[index];
-                    final alignment = message['isUserMessage']
+                    final isUserMessage = message['isUserMessage'];
+                    final alignment = isUserMessage
                         ? Alignment.centerRight
                         : Alignment.centerLeft;
-                    final color = message['isUserMessage']
+                    final color = isUserMessage
                         ? Colors.blue[200]
                         : Colors.grey[300];
+                    final avatar = isUserMessage
+                        ? 'assets/user_avatar.png'
+                        : 'assets/system_avatar.png';
+                    
                     return Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 14),
                       alignment: alignment,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(message['text']),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!isUserMessage)
+                            CircleAvatar(
+                              backgroundImage: AssetImage(avatar),
+                            ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(message['text']),
+                          ),
+                          if (isUserMessage)
+                            const SizedBox(width: 8),
+                          if (isUserMessage)
+                            CircleAvatar(
+                              backgroundImage: AssetImage(avatar),
+                            ),
+                        ],
                       ),
                     );
                   },
@@ -201,8 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         decoration: InputDecoration(
                           hintText: 'Enter a message',
                           filled: true, // 添加这一行
-                          fillColor: Color.fromARGB(
-                              255, 238, 238, 238), // 添加这一行，设置为浅灰色
+                          fillColor: Color.fromARGB(255, 238, 238, 238), // 添加这一行，设置为浅灰色
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
