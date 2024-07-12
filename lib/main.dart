@@ -31,6 +31,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, dynamic>> _messages = [];
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   static const int maxMessages = 10; // 最大消息历史记录
 
@@ -47,6 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _controller.clear();
         _simulateAutoReply(text);
       }
+      _scrollToBottom(); // 每次添加新消息时滚动到底部
     });
   }
 
@@ -113,6 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
             'text': replyMessage,
             'isUserMessage': false,
           });
+          _scrollToBottom(); // 每次添加新消息时滚动到底部
         });
       } else {
         throw Exception('这会儿我不在哦~有事就给我留言吧');
@@ -127,8 +130,21 @@ class _ChatScreenState extends State<ChatScreen> {
           'text': errorMessage,
           'isUserMessage': false,
         });
+        _scrollToBottom(); // 每次添加新消息时滚动到底部
       });
     }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -149,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
+		  controller: _scrollController,
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final message = _messages[index];
