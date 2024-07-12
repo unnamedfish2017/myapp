@@ -69,7 +69,6 @@ class _ChatScreenState extends State<ChatScreen> {
           'role': 'system',
           'content': '你现在扮演我的女友小夏，性格非常高冷，对我爱答不理。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
         },
-        {'role': 'user', 'content': userMessage},
       ];
       for (int i = 0; i < _messages.length && i < 10; i++) {
         messageHistory.add({
