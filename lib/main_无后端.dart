@@ -67,7 +67,8 @@ class _ChatScreenState extends State<ChatScreen> {
       List<Map<String, dynamic>> messageHistory = [
         {
           'role': 'system',
-          'content': '你现在扮演我的女友小夏，性格非常高冷，对我爱答不理。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
+          // 'content': '你现在扮演我的女友小夏，性格非常高冷，对我爱答不理。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
+          'content': '你现在扮演我的女友小夏，是一个软萌妹子。你说话通常比较简短，非常偶尔会有长的回复'
         },
       ];
       for (int i = 0; i < _messages.length && i < 10; i++) {
@@ -191,13 +192,21 @@ class _ChatScreenState extends State<ChatScreen> {
                               backgroundImage: AssetImage(avatar),
                             ),
                           const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: color,
-                              borderRadius: BorderRadius.circular(10),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.7,
                             ),
-                            child: Text(message['text']),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                message['text'],
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
                           ),
                           if (isUserMessage) const SizedBox(width: 8),
                           if (isUserMessage)

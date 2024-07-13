@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -53,60 +54,24 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _simulateAutoReply(String userMessage) async {
-    // 替换为你的 Moonshot API 相关信息
-    //moonshot
-    // const String apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
-    // const String apiKey =
-    //     'sk-3sq88ly5bVhIQNbuqPi7xPiLlG5mtNrucHI0LbHK6RnDmDGb'; // 替换为你的 API KEY
-
-    //deepseek
-    const String apiUrl = "https://api.deepseek.com/chat/completions";
-    const String apiKey = "sk-029ef31805dc4a2e944e89a161367a8e";
+    const String apiUrl =
+        "http://116.205.182.116:3000/messages"; // 替换为你的 MongoDB 后端 API URL
     try {
-      // 构建消息历史
-      List<Map<String, dynamic>> messageHistory = [
-        {
-          'role': 'system',
-          // 'content': '你现在扮演我的女友小夏，性格非常高冷，对我爱答不理。你说话通常非常简短，保持在10个字以内,非常偶尔会有长的回复'
-          'content': '你现在扮演我的女友小夏，是一个软萌妹子。你说话通常比较简短，非常偶尔会有长的回复'
-        },
-      ];
-      for (int i = 0; i < _messages.length && i < 10; i++) {
-        messageHistory.add({
-          'role': _messages[i]['isUserMessage'] ? 'user' : 'system',
-          'content': _messages[i]['text'],
-        });
-      }
-
-      // 添加当前用户输入的消息
-      messageHistory.add({
-        'role': 'user',
-        'content': userMessage,
-      });
-
-      // 调用API
+      // 调用 MongoDB 后端 API
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
         },
-        // body: json.encode({
-        //   'model': 'moonshot-v1-8k',
-        //   'messages': messageHistory,
-        //   'temperature': 0.3,
-        // }),
-
         body: json.encode({
-          'model': 'deepseek-chat',
-          'messages': messageHistory,
-          'temperature': 1.25,
+          'content': userMessage,
         }),
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        final replyMessage = data['choices'][0]['message']['content'] as String;
+        final replyMessage =
+            data['replyMessage'] as String; // 根据后端返回的数据结构调整获取回复消息的方式
         setState(() {
           if (_messages.length >= maxMessages) {
             _messages.removeAt(0); // 删除最旧的消息，以保留最新的 maxMessages 条消息
@@ -118,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
           _scrollToBottom(); // 每次添加新消息时滚动到底部
         });
       } else {
-        throw Exception('这会儿我不在哦~有事就给我留言吧');
+        throw Exception('接收到错误响应: ${response.statusCode}');
       }
     } catch (e) {
       // 将异常对象转换为字符串
@@ -136,7 +101,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -227,7 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: TextField(
                         controller: _controller,
                         decoration: InputDecoration(
-                          hintText: 'Enter a message',
+                          hintText: '输入消息',
                           filled: true, // 添加这一行
                           fillColor: Color.fromARGB(
                               255, 238, 238, 238), // 添加这一行，设置为浅灰色
