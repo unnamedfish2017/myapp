@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
+import 'select.dart'; // 替换为第一页的Dart文件路径
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
+}
+
+class ChatArguments {
+  final String girlId;
+  final String userId; // 新增用户信息字段
+
+  ChatArguments(this.girlId, this.userId);
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
+
+  // 定义路由映射
+  final Map<String, WidgetBuilder> routes = {
+    '/': (context) => const FirstPage(), // 首页
+    '/chat': (context) => const ChatScreen(), // 聊天页面
+  };
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Chat UI Demo',
+      title: 'Flutter Navigation Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const ChatScreen(),
+      initialRoute: '/', // 设置初始路由为首页
+      routes: routes, // 将路由映射传递给 MaterialApp
     );
   }
 }
@@ -35,6 +49,42 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
 
   static const int maxMessages = 10; // 最大消息历史记录
+  late String girlId; // 聊天对象标识符
+  late String userId; // 用户标识符
+  late String greeting;
+  late String bg_img;
+  late String avatar_img;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 获取从上一个页面传递的参数
+
+    final args = ModalRoute.of(context)?.settings.arguments as ChatArguments?;
+    if (args != null) {
+      girlId = args.girlId;
+      userId = args.userId;
+    } else {
+      girlId = '';
+      userId = '';
+    }
+
+    greeting = girlId == 'xiaoxia'
+        ? '小夏'
+        : girlId == 'shihan'
+            ? '诗函'
+            : '';
+    bg_img = girlId == 'xiaoxia'
+        ? 'background.png'
+        : girlId == 'shihan'
+            ? 'background_sh.png'
+            : '';
+    avatar_img = girlId == 'xiaoxia'
+        ? 'system_avatar.png'
+        : girlId == 'shihan'
+            ? 'system_avatar_sh.png'
+            : '';
+  }
 
   void _sendMessage(String text, bool isUserMessage) {
     setState(() {
@@ -44,6 +94,8 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.add({
         'text': text,
         'isUserMessage': isUserMessage,
+        'girlId': girlId,
+        'userId': userId,
       });
       if (isUserMessage) {
         _controller.clear();
@@ -65,6 +117,8 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         body: json.encode({
           'content': userMessage,
+          'girlId': girlId,
+          'userId': userId,
         }),
       );
 
@@ -116,13 +170,13 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('小夏'),
+        title: Text('Chat with $greeting'), // 使用聊天对象标识符作为标题
       ),
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/background.png', // 确保在你的项目中有这个图片文件
+              'assets/$bg_img', // 确保在你的项目中有这个图片文件
               fit: BoxFit.cover,
             ),
           ),
@@ -142,7 +196,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         isUserMessage ? Colors.blue[200] : Colors.grey[300];
                     final avatar = isUserMessage
                         ? 'assets/user_avatar.jpg'
-                        : 'assets/system_avatar.png';
+                        : 'assets/$avatar_img';
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
