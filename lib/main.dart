@@ -72,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
     greeting = girlId == 'xiaoxia'
         ? '小夏'
         : girlId == 'shihan'
-            ? '诗函'
+            ? '诗涵'
             : '';
     bg_img = girlId == 'xiaoxia'
         ? 'background.png'
