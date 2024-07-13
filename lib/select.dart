@@ -1,8 +1,26 @@
 import 'package:flutter/material.dart';
 import 'main.dart'; // 替换为您的聊天页面文件路径
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 
 class FirstPage extends StatelessWidget {
   const FirstPage({Key? key}) : super(key: key);
+
+  Future<String> _getDeviceIdentifier() async {
+    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfoPlugin.androidInfo;
+        return androidInfo.androidId ?? 'unknown';
+      } else if (Platform.isIOS) {
+        final IosDeviceInfo iosInfo = await deviceInfoPlugin.iosInfo;
+        return iosInfo.identifierForVendor ?? 'unknown'; // 使用iOS的唯一ID，处理为空情况
+      }
+    } catch (e) {
+      print('Error getting device identifier: $e');
+    }
+    return 'unknown';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +33,12 @@ class FirstPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                String userId = await _getDeviceIdentifier();
                 Navigator.pushNamed(
                   context,
                   '/chat',
-                  arguments:
-                      ChatArguments('shihan', 'unique_chat_id'), // 示例用户信息
+                  arguments: ChatArguments('shihan', userId),
                 );
               },
               child: Padding(
@@ -33,12 +51,12 @@ class FirstPage extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                String userId = await _getDeviceIdentifier();
                 Navigator.pushNamed(
                   context,
                   '/chat',
-                  arguments:
-                      ChatArguments('xiaoxia', 'unique_chat_id'), // 示例用户信息
+                  arguments: ChatArguments('xiaoxia', userId), // 示例用户信息
                 );
               },
               child: Padding(
