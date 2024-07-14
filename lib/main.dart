@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  static const int maxMessages = 10; // 最大消息历史记录
+  static const int maxMessages = 1000; // 最大消息历史记录
   late String girlId; // 聊天对象标识符
   late String userId; // 用户标识符
   late String greeting;
@@ -91,11 +91,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _loadMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? storedMessages = prefs.getStringList('chat_messages');
+    List<String>? storedMessages;
+
+    if (girlId == 'xiaoxia') {
+      storedMessages = prefs.getStringList('xiaoxia_messages');
+    } else if (girlId == 'shihan') {
+      storedMessages = prefs.getStringList('shihan_messages');
+    }
+
     if (storedMessages != null) {
       setState(() {
         _messages.clear();
-        for (String message in storedMessages) {
+        for (String message in storedMessages ?? []) {
           _messages.add(jsonDecode(message));
         }
       });
@@ -104,8 +111,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _saveMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> storedMessages = _messages.map((message) => jsonEncode(message)).toList();
-    await prefs.setStringList('chat_messages', storedMessages);
+
+    // 根据 girlId 存储不同的聊天记录
+    List<String> storedMessages = _messages
+        .where((message) => message['girlId'] == 'xiaoxia')
+        .map((message) => jsonEncode(message))
+        .toList();
+    await prefs.setStringList('xiaoxia_messages', storedMessages);
+
+    storedMessages = _messages
+        .where((message) => message['girlId'] == 'shihan')
+        .map((message) => jsonEncode(message))
+        .toList();
+    await prefs.setStringList('shihan_messages', storedMessages);
   }
 
   void _sendMessage(String text, bool isUserMessage) {
@@ -162,6 +180,8 @@ class _ChatScreenState extends State<ChatScreen> {
           _messages.add({
             'text': replyMessage,
             'isUserMessage': false,
+            'girlId': girlId,
+            'userId': userId,
           });
           _scrollToBottom(); // 每次添加新消息时滚动到底部
         });
@@ -178,6 +198,8 @@ class _ChatScreenState extends State<ChatScreen> {
         _messages.add({
           'text': errorMessage,
           'isUserMessage': false,
+          'girlId': girlId,
+          'userId': userId,
         });
         _scrollToBottom(); // 每次添加新消息时滚动到底部
       });
