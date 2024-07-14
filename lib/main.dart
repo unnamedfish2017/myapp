@@ -108,12 +108,18 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _simulateAutoReply(String userMessage) async {
     const String apiUrl =
         "http://116.205.182.116:3000/messages"; // 替换为你的 MongoDB 后端 API URL
+    const String username = "gfs";
+    const String password = "gfs202407";
+    String basicAuth = 'Basic ' +
+        base64Encode(utf8.encode('$username:$password')); // 替换为实际的用户名和密码
+
     try {
       // 调用 MongoDB 后端 API
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': basicAuth, // 添加授权信息到请求头
         },
         body: json.encode({
           'content': userMessage,
@@ -141,7 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       // 将异常对象转换为字符串
-      String errorMessage = e.toString();
+      String errorMessage = "稍等哈~"; //e.toString();
 
       setState(() {
         // 更新状态，添加异常信息作为文本消息
@@ -258,7 +264,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.send),
-                      color: Color.fromARGB(255, 238, 238, 238),
+                      color: Color.fromARGB(169, 61, 46, 46),
                       onPressed: () => _sendMessage(_controller.text, true),
                     ),
                   ],
