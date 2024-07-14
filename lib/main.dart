@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'select.dart'; // 替换为第一页的Dart文件路径
 
 void main() {
@@ -84,6 +85,27 @@ class _ChatScreenState extends State<ChatScreen> {
         : girlId == 'shihan'
             ? 'system_avatar_sh.png'
             : '';
+
+    _loadMessages(); // 加载存储的聊天记录
+  }
+
+  Future<void> _loadMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? storedMessages = prefs.getStringList('chat_messages');
+    if (storedMessages != null) {
+      setState(() {
+        _messages.clear();
+        for (String message in storedMessages) {
+          _messages.add(jsonDecode(message));
+        }
+      });
+    }
+  }
+
+  Future<void> _saveMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> storedMessages = _messages.map((message) => jsonEncode(message)).toList();
+    await prefs.setStringList('chat_messages', storedMessages);
   }
 
   void _sendMessage(String text, bool isUserMessage) {
@@ -103,6 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
       _scrollToBottom(); // 每次添加新消息时滚动到底部
     });
+    _saveMessages(); // 每次发送消息后保存聊天记录
   }
 
   Future<void> _simulateAutoReply(String userMessage) async {
@@ -142,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
           });
           _scrollToBottom(); // 每次添加新消息时滚动到底部
         });
+        _saveMessages(); // 保存聊天记录
       } else {
         throw Exception('接收到错误响应: ${response.statusCode}');
       }
@@ -157,6 +181,7 @@ class _ChatScreenState extends State<ChatScreen> {
         });
         _scrollToBottom(); // 每次添加新消息时滚动到底部
       });
+      _saveMessages(); // 保存聊天记录
     }
   }
 
