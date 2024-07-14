@@ -171,19 +171,32 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        final replyMessage =
-            data['replyMessage'] as String; // 根据后端返回的数据结构调整获取回复消息的方式
+        //print(data);
+        dynamic responseData = data['replyMessage']; // 获取后端返回的数据
+        List<String> replyMessages = []; // 初始化一个空列表
+        // 调试输出 responseData 类型和内容
+        //print('Response data type: ${responseData.runtimeType}');
+        //print('Response data: $responseData');
+        if (responseData is List) {
+          // 如果 responseData 是列表类型，直接赋值给 replyMessages
+          replyMessages = List<String>.from(responseData);
+        } else if (responseData is String) {
+          // 如果 responseData 是字符串类型，将其添加到 replyMessages 中
+          replyMessages.add(responseData);
+        }
         setState(() {
           if (_messages.length >= maxMessages) {
-            _messages.removeAt(0); // 删除最旧的消息，以保留最新的 maxMessages 条消息
+            _messages.removeAt(0);
           }
-          _messages.add({
-            'text': replyMessage,
-            'isUserMessage': false,
-            'girlId': girlId,
-            'userId': userId,
-          });
-          _scrollToBottom(); // 每次添加新消息时滚动到底部
+          for (String replyMessage in replyMessages) {
+            _messages.add({
+              'text': replyMessage,
+              'isUserMessage': false,
+              'girlId': girlId,
+              'userId': userId,
+            });
+          }
+          _scrollToBottom();
         });
         _saveMessages(); // 保存聊天记录
       } else {
