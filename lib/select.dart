@@ -43,10 +43,36 @@ class FirstPage extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  'assets/shihan.png', // 替换为您的图片路径
-                  width: 200,
-                  height: 200,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/shihan.png', // 替换为您的图片路径
+                      width: 200,
+                      height: 200,
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '诗 涵',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '21岁，性格温柔，\n富有感染力。\n热爱生活热爱小动物，\n幽默感中带有一丝顽皮。',
+                          style: TextStyle(fontSize: 12),
+                          maxLines: null,
+                          overflow: TextOverflow.clip, // 超出部分直接截断
+                        ),
+                        // Text(
+                        //   '点击与诗涵聊天', // 添加您的描述文本
+                        //   style: TextStyle(fontSize: 14, color: Colors.grey),
+                        // ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -61,10 +87,36 @@ class FirstPage extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  'assets/xiaoxia.png', // 替换为您的图片路径
-                  width: 200,
-                  height: 200,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/xiaoxia.png', // 替换为您的图片路径
+                      width: 200,
+                      height: 200,
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '小 夏',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '23岁，孤傲冷艳，\n追求者众多。\n冰冷外表下，\n隐藏着火热内心。',
+                          style: TextStyle(fontSize: 12),
+                          maxLines: null,
+                          overflow: TextOverflow.clip, // 超出部分直接截断
+                        ),
+                        // Text(
+                        //   '点击与小夏聊天', // 添加您的描述文本
+                        //   style: TextStyle(fontSize: 14, color: Colors.grey),
+                        // ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
