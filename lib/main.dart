@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'select.dart'; // 替换为第一页的Dart文件路径
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -55,6 +56,8 @@ class _ChatScreenState extends State<ChatScreen> {
   late String greeting;
   late String bg_img;
   late String avatar_img;
+  late Timer _typingTimer; // 添加计时器
+  String _typingStatus = ''; // 用于存储“对方正在输入”的状态
 
   @override
   void didChangeDependencies() {
@@ -109,6 +112,23 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void _startTypingIndicator() {
+    int dotCount = 1;
+    _typingTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        _typingStatus = '对方正在输入' + '.' * dotCount;
+        dotCount = dotCount < 3 ? dotCount + 1 : 1;
+      });
+    });
+  }
+
+  void _stopTypingIndicator() {
+    _typingTimer.cancel();
+    setState(() {
+      _typingStatus = '';
+    });
+  }
+
   Future<void> _saveMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -154,6 +174,8 @@ class _ChatScreenState extends State<ChatScreen> {
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('$username:$password')); // 替换为实际的用户名和密码
 
+    // 开始显示“对方正在输入”
+    _startTypingIndicator();
     try {
       // 调用 MongoDB 后端 API
       final response = await http.post(
@@ -217,6 +239,9 @@ class _ChatScreenState extends State<ChatScreen> {
         _scrollToBottom(); // 每次添加新消息时滚动到底部
       });
       _saveMessages(); // 保存聊天记录
+    } finally {
+      // 停止显示“对方正在输入”
+      _stopTypingIndicator();
     }
   }
 
@@ -236,7 +261,10 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with $greeting'), // 使用聊天对象标识符作为标题
+        //title: Text('Chat with $greeting'), // 使用聊天对象标识符作为标题
+        title: Text(_typingStatus.isEmpty
+            ? 'Chat with $greeting'
+            : _typingStatus), // 使用 _typingStatus 更新标题
       ),
       body: Stack(
         children: [
