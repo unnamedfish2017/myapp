@@ -84,41 +84,58 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         title: Text('Register'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: '用户名'),
+      body: Stack(
+        children: <Widget>[
+          // 背景图片
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/cover.webp',
+              fit: BoxFit.cover,
             ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: '密码'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          ),
+          // 主要内容
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               children: <Widget>[
-                ElevatedButton(
-                  onPressed: () => _register(context),
-                  child: Text('注册'),
+                TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(labelText: '用户名'),
                 ),
-                ElevatedButton(
-                  onPressed: () => _login(context),
-                  child: Text('登录'),
+                TextField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(labelText: '密码'),
+                  obscureText: true,
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () => _register(context),
+                      child: Text('注册'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _login(context),
+                      child: Text('登录'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                if (_errorMessage.isNotEmpty)
+                  Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                Spacer(), // 用于将文字说明框推到页面底部
+                Text(
+                  '开启你的奇幻之旅吧',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            if (_errorMessage.isNotEmpty)
-              Text(
-                _errorMessage,
-                style: TextStyle(color: Colors.red, fontSize: 12),
-              ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
