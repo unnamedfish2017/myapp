@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'select.dart'; // 替换为第一页的Dart文件路径
 import 'dart:async';
+import 'register.dart';
+import 'user_provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class ChatArguments {
@@ -21,7 +29,8 @@ class MyApp extends StatelessWidget {
 
   // 定义路由映射
   final Map<String, WidgetBuilder> routes = {
-    '/': (context) => const FirstPage(), // 首页
+    '/': (context) => RegisterPage(),
+    '/select': (context) => const FirstPage(), // 首页
     '/chat': (context) => const ChatScreen(), // 聊天页面
   };
 
@@ -32,7 +41,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/', // 设置初始路由为首页
+      initialRoute: '/', // 设置初始路由为注册页面
       routes: routes, // 将路由映射传递给 MaterialApp
     );
   }
@@ -81,7 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
     bg_img = girlId == 'xiaoxia'
         ? 'background.png'
         : girlId == 'shihan'
-            ? 'background_sh.png'
+            ? 'background_sh.jpg'
             : '';
     avatar_img = girlId == 'xiaoxia'
         ? 'system_avatar.png'
@@ -261,11 +270,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //title: Text('Chat with $greeting'), // 使用聊天对象标识符作为标题
-        title: Text(_typingStatus.isEmpty
-            ? 'Chat with $greeting'
-            : _typingStatus), // 使用 _typingStatus 更新标题
-      ),
+          //title: Text('Chat with $greeting'), // 使用聊天对象标识符作为标题
+          title: Text(
+        _typingStatus.isEmpty ? 'Chat with $greeting' : _typingStatus,
+        style: TextStyle(fontSize: 18.0),
+      ) // 调整字体大小为18.0), // 使用 _typingStatus 更新标题
+          ),
       body: Stack(
         children: [
           Positioned.fill(

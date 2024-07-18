@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'main.dart'; // 替换为您的聊天页面文件路径
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
+import 'user_provider.dart';
 
 class FirstPage extends StatelessWidget {
   const FirstPage({Key? key}) : super(key: key);
@@ -34,7 +36,8 @@ class FirstPage extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () async {
-                String userId = await _getDeviceIdentifier();
+                String userId = Provider.of<UserProvider>(context).userId ??
+                    'defaultUserId'; //await _getDeviceIdentifier();
                 Navigator.pushNamed(
                   context,
                   '/chat',
@@ -78,7 +81,8 @@ class FirstPage extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () async {
-                String userId = await _getDeviceIdentifier();
+                String userId = Provider.of<UserProvider>(context).userId ??
+                    'defaultUserId'; //await _getDeviceIdentifier();
                 Navigator.pushNamed(
                   context,
                   '/chat',
@@ -105,7 +109,7 @@ class FirstPage extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          '23岁，孤傲冷艳，\n追求者众多。\n冰冷外表下，\n隐藏着火热内心。',
+                          '27岁，孤傲冷艳，\n追求者众多。\n冰冷外表下，\n隐藏着火热内心。',
                           style: TextStyle(fontSize: 12),
                           maxLines: null,
                           overflow: TextOverflow.clip, // 超出部分直接截断
