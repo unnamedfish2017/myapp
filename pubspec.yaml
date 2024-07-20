@@ -18,7 +18,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   device_info_plus: ^3.2.0
-
+  shared_preferences: ^2.0.6
+  provider: ^6.0.0
+  flutter_sound: ^8.5.0
+  path_provider: ^2.0.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -28,10 +32,13 @@ flutter:
   assets:
     - assets/background.png
     - assets/background_sh.png
+    - assets/background_sh.jpg
     - assets/user_avatar.png
     - assets/user_avatar.jpg
     - assets/system_avatar.png
     - assets/system_avatar_sh.png
     - assets/xiaoxia.png
     - assets/shihan.png
+    - assets/cover.png
+    - assets/blue.jpg
 
