@@ -7,9 +7,6 @@ import 'select.dart'; // 替换为第一页的Dart文件路径
 import 'dart:async';
 import 'register.dart';
 import 'user_provider.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 void main() {
   runApp(
@@ -68,22 +65,8 @@ class _ChatScreenState extends State<ChatScreen> {
   late String greeting;
   late String bg_img;
   late String avatar_img;
-  late Timer _typingTimer;
-  String _typingStatus = '';
-
-  late FlutterSoundPlayer _player;
-
-  @override
-  void initState() {
-    super.initState();
-    _player = FlutterSoundPlayer();
-    _initializePlayer();
-  }
-
-  Future<void> _initializePlayer() async {
-    await _player
-        .openAudioSession(); // Ensure the player is properly initialized
-  }
+  late Timer _typingTimer; // 添加计时器
+  String _typingStatus = ''; // 用于存储“对方正在输入”的状态
 
   @override
   void didChangeDependencies() {
@@ -155,24 +138,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  Future<void> playAmrAudio(List<int> audioBytes) async {
-    // 获取临时目录
-    final tempDir = await getTemporaryDirectory();
-    final tempPath = '${tempDir.path}/temp_audio.amr';
-
-    // 将音频数据写入文件
-    final tempFile = File(tempPath);
-    await tempFile.writeAsBytes(audioBytes);
-
-    // 确保音频会话已经打开
-    if (!_player.isPlaying) {
-      await _player.startPlayer(
-        fromURI: tempPath,
-        codec: Codec.amrNB,
-      );
-    }
-  }
-
   Future<void> _saveMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -238,40 +203,36 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        //print(data);
-        dynamic responseData = data['replyMessage']; // 获取后端返回的数据
-        String type = data['type'];
-        List<String> replyMessages = []; // 初始化一个空列表
-        // 调试输出 responseData 类型和内容
-        //print('Response data type: ${responseData.runtimeType}');
-        //print('Response data: $responseData');
+        dynamic responseData = data['replyMessage'];
+        List<dynamic> replyMessages = [];
         if (responseData is List) {
-          // 如果 responseData 是列表类型，直接赋值给 replyMessages
-          replyMessages = List<String>.from(responseData);
-        } else if (responseData is String) {
-          // 如果 responseData 是字符串类型，将其添加到 replyMessages 中
-          if (type == 'text') {
-            // 处理文本信息
-            replyMessages.add(responseData);
-          } else if (type == 'audio') {
-            // Handle audio file
-            final audioBytes = base64Decode(responseData);
-            await playAmrAudio(audioBytes);
-            replyMessages.add(base64Encode(audioBytes));
-          }
+          replyMessages = responseData;
+        } else {
+          replyMessages.add(responseData);
         }
         setState(() {
           if (_messages.length >= maxMessages) {
             _messages.removeAt(0);
           }
-          for (String replyMessage in replyMessages) {
-            _messages.add({
-              'text': replyMessage,
-              'isUserMessage': false,
-              'girlId': girlId,
-              'userId': userId,
-              'type': type, // 添加 type 属性
-            });
+          for (var replyMessage in replyMessages) {
+            if (data['type'] == 'text') {
+              _messages.add({
+                'text': replyMessage,
+                'isUserMessage': false,
+                'type': 'text',
+                'girlId': girlId,
+                'userId': userId,
+              });
+            } else if (data['type'] == 'image') {
+              print(replyMessage);
+              _messages.add({
+                'imageBase64': replyMessage,
+                'isUserMessage': false,
+                'type': 'image',
+                'girlId': girlId,
+                'userId': userId,
+              });
+            }
           }
           _scrollToBottom();
         });
@@ -281,13 +242,15 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       // 将异常对象转换为字符串
-      String errorMessage = e.toString(); //"稍等哈~"; //e.toString();
+      String errorMessage = e.toString();
+     // "稍等哈~"; //e.toString();
 
       setState(() {
         // 更新状态，添加异常信息作为文本消息
         _messages.add({
           'text': errorMessage,
           'isUserMessage': false,
+          'type': 'text',
           'girlId': girlId,
           'userId': userId,
         });
@@ -301,7 +264,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -310,15 +273,6 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       }
     });
-  }
-
-  @override
-  void dispose() {
-    if (_player.isPlaying) {
-      _player.stopPlayer(); // Ensure to stop the player if it's running
-    }
-    _player.closeAudioSession();
-    super.dispose();
   }
 
   @override
@@ -380,14 +334,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 color: color,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: message['type'] == 'audio'
-                                  ? IconButton(
-                                      icon: Icon(Icons.play_arrow),
-                                      onPressed: () async {
-                                        final audioBytes =
-                                            base64Decode(message['text']);
-                                        await playAmrAudio(audioBytes);
-                                      },
+                              child: message['type'] == 'image'
+                                  ? Image.memory(
+                                      base64Decode(message['imageBase64']
+                                          .split(',')
+                                          .last),
+                                      fit: BoxFit.cover,
                                     )
                                   : Text(
                                       message['text'],
