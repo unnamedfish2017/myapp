@@ -48,9 +48,10 @@ class FirstPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       String userId =
-                          Provider.of<UserProvider>(context, listen: false)
-                              .userId ??
-                          'defaultUserId'; //await _getDeviceIdentifier();
+                          //Provider.of<UserProvider>(context, listen: false)
+                          //    .userId ??
+                          //'defaultUserId';
+                          await _getDeviceIdentifier();
                       Navigator.pushNamed(
                         context,
                         '/chat',
@@ -96,8 +97,8 @@ class FirstPage extends StatelessWidget {
                     onTap: () async {
                       String userId =
                           Provider.of<UserProvider>(context, listen: false)
-                              .userId ??
-                          'defaultUserId'; //await _getDeviceIdentifier();
+                                  .userId ??
+                              'defaultUserId'; //await _getDeviceIdentifier();
                       Navigator.pushNamed(
                         context,
                         '/chat',
